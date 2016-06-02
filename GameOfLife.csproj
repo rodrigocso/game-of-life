@@ -46,42 +46,49 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AboutDialog.cs">
+    <Compile Include="Model\Config.cs" />
+    <Compile Include="View\AboutDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AboutDialog.Designer.cs">
+    <Compile Include="View\AboutDialog.Designer.cs">
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </Compile>
-    <Compile Include="GameOfLifeForm.cs">
+    <Compile Include="View\GameOfLifeForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="GameOfLifeForm.Designer.cs">
+    <Compile Include="View\GameOfLifeForm.Designer.cs">
       <DependentUpon>GameOfLifeForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="GraphicsPanel.cs">
+    <Compile Include="View\GraphicsPanel.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="OptionsDialog.cs">
+    <Compile Include="View\OptionsDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OptionsDialog.Designer.cs">
+    <Compile Include="View\OptionsDialog.Designer.cs">
       <DependentUpon>OptionsDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SeedDialog.cs">
+    <Compile Include="View\RunToDialog.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SeedDialog.Designer.cs">
+    <Compile Include="View\RunToDialog.Designer.cs">
+      <DependentUpon>RunToDialog.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\SeedDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\SeedDialog.Designer.cs">
       <DependentUpon>SeedDialog.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="AboutDialog.resx">
+    <EmbeddedResource Include="View\AboutDialog.resx">
       <DependentUpon>AboutDialog.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="GameOfLifeForm.resx">
+    <EmbeddedResource Include="View\GameOfLifeForm.resx">
       <DependentUpon>GameOfLifeForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="OptionsDialog.resx">
+    <EmbeddedResource Include="View\OptionsDialog.resx">
       <DependentUpon>OptionsDialog.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -94,7 +101,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="SeedDialog.resx">
+    <EmbeddedResource Include="View\RunToDialog.resx">
+      <DependentUpon>RunToDialog.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\SeedDialog.resx">
       <DependentUpon>SeedDialog.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
@@ -108,7 +118,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="View\App.config" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Run_16x.png" />
@@ -120,7 +130,7 @@
     <None Include="Resources\Next_16x.png" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="icons\progIco.ico" />
+    <None Include="Resources\progIco.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
