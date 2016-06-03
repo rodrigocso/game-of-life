@@ -11,7 +11,7 @@ namespace GameOfLife
     {
         bool[,] universe, scratchPad;
         int generations = 0;
-        int generationsLimit = 0; // limit used by "Run To..."
+        int generationsLimit = 0; // threshold enforced by "Run To..."
         int liveCells = 0;
 
         Timer timer = new Timer();
@@ -19,6 +19,8 @@ namespace GameOfLife
         public GameOfLifeForm()
         {
             InitializeComponent();
+            Config.Seed = Math.Abs((int)DateTime.Now.Ticks);
+            Config.Rng = new Random(Config.Seed);
             Config.LoadInitialConfig();
             ApplyConfig();
 
@@ -146,8 +148,11 @@ namespace GameOfLife
             if (count == 0)
                 return;
 
+            float width = (float)graphicsPanel.ClientSize.Width / universe.GetLength(0);
+            float height = (float)graphicsPanel.ClientSize.Height / universe.GetLength(1);
+
             Brush b = (count < 2 || count > 3) ? Brushes.Red : Brushes.Green;
-            Font font = new Font("Courier New", 8.0f);
+            Font font = new Font("Courier New", 0.5f * Math.Min(width, height));
 
             StringFormat sf = new StringFormat();
             sf.Alignment = StringAlignment.Center;
@@ -258,6 +263,45 @@ namespace GameOfLife
                 generationsLimit = rtd.TargetGeneration;
                 startToolStripMenuItem_Click(sender, e);
             }
+        }
+
+        private void fromTimeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RandomizeGrid(Math.Abs((int)DateTime.Now.Ticks));
+        }
+
+        private void RandomizeGrid(int? seed)
+        {
+            if (seed != null)
+            {
+                Config.Rng = new Random((int)seed);
+                Config.Seed = (int)seed;
+            }
+
+            for (int y = 0; y < universe.GetLength(1); y++)
+                for (int x = 0; x < universe.GetLength(0); x++)
+                    universe[x, y] = (Config.Rng.Next() % 2 == 0);
+
+            lblSeed.Text = "Seed: " + Config.Seed;
+            graphicsPanel.Invalidate();
+        }
+
+        private void fromCurrentSeedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RandomizeGrid(null);
+        }
+
+        private void fromNewSeedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SeedDialog sd = new SeedDialog(Config.Seed);
+            if (sd.ShowDialog() == DialogResult.OK)
+                RandomizeGrid(sd.Seed);
+        }
+
+        private void resetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Config.LoadInitialConfig();
+            ApplyConfig();
         }
 
         /// <summary>

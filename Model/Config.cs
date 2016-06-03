@@ -21,13 +21,17 @@ namespace GameOfLife
         public static Color BackgroundColor { get; set; }
         public static Color LiveCellColor { get; set; }
 
-        public enum Bounderies { Toroidal, Finite, Infinite };
-        public static Bounderies Boundary { get; set; }
+        public enum Boundaries { Toroidal, Finite };
+        public static Boundaries Boundary { get; set; }
 
         public static bool IsGridVisible { get; set; }
         public static bool IsHeadsUpDisplayVisible { get; set; }
         public static bool IsNeighborCountVisible { get; set; }
 
+        /// <summary>
+        ///   This method sets the program's initial
+        ///   configurations. Currently hard-coded.
+        /// </summary>
         public static void LoadInitialConfig()
         {
             Interval = 20;
@@ -37,13 +41,10 @@ namespace GameOfLife
             GridTensColor = Color.Black;
             BackgroundColor = Color.White;
             LiveCellColor = Color.LimeGreen;
-            Boundary = Bounderies.Finite;
+            Boundary = Boundaries.Finite;
             IsGridVisible = true;
             IsHeadsUpDisplayVisible = true;
-            IsNeighborCountVisible = false;
-
-            Seed = (int)DateTime.Now.Ticks & 0x0000FFFF;
-            Rng = new Random(Seed);
+            IsNeighborCountVisible = true;
         }
     }
 }
