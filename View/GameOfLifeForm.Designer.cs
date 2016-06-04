@@ -74,7 +74,7 @@
             this.lblCells = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblSeed = new System.Windows.Forms.ToolStripStatusLabel();
             this.lblBoundary = new System.Windows.Forms.ToolStripStatusLabel();
-            this.graphicsPanel = new GameOfLife.GraphicsPanel();
+            this.graphicsPanel = new GraphicsPanel();
             this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();

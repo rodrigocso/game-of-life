@@ -9,20 +9,17 @@ namespace GameOfLife
     /// </summary>
     public partial class GameOfLifeForm : Form
     {
-        bool[,] universe, scratchPad;
-        int generations = 0;
-        int generationsLimit = 0; // threshold enforced by "Run To..."
-        int liveCells = 0;
-
+        float _cellWidth, _cellHeight;
+        
         Timer timer = new Timer();
+        GameOfLife _life = new GameOfLife();
 
         public GameOfLifeForm()
         {
             InitializeComponent();
-            Config.Seed = Math.Abs((int)DateTime.Now.Ticks);
-            Config.Rng = new Random(Config.Seed);
             Config.LoadInitialConfig();
-            ApplyConfig();
+            _life.UpdateFromConfig();
+            UpdateFromConfig();
 
             timer.Tick += Timer_Tick;
             timer.Enabled = false;
@@ -30,26 +27,11 @@ namespace GameOfLife
 
         /// <summary>
         ///   <para>Applies configuration information available
-        ///   on Config (static) class to update the program.</para>
+        ///   on Config (static) class to update the form.</para>
         ///   <see cref="Config"/> for more details.
         /// </summary>
-        private void ApplyConfig()
+        private void UpdateFromConfig()
         {
-            scratchPad = new bool[Config.Height, Config.Width];
-
-            if (universe == null)
-                universe = new bool[Config.Height, Config.Width];
-
-            for (int y = 0; y < scratchPad.GetLength(1) || y < universe.GetLength(1); y++)
-                for (int x = 0; x < scratchPad.GetLength(0) || x < universe.GetLength(0); x++)
-                    scratchPad[x, y] = universe[x, y];
-
-            universe = new bool[Config.Height, Config.Width];
-
-            for (int y = 0; y < universe.GetLength(1); y++)
-                for (int x = 0; x < universe.GetLength(0); x++)
-                    universe[x, y] = scratchPad[x, y];
-
             timer.Interval = Config.Interval;
             lblSeed.Text = "Seed: " + Config.Seed;
             lblBoundary.Text = "Boundary: " + Config.Boundary;
@@ -81,57 +63,70 @@ namespace GameOfLife
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            NextGeneration();
+            _life.NextGeneration();
+            graphicsPanel.Invalidate();
 
-            if (generations == generationsLimit)
+            if (_life.HasReachedLimit)
                 pauseToolStripMenuItem_Click(sender, e);
         }
 
         private void graphicsPanel_Paint(object sender, PaintEventArgs e)
         {
-            float width = (float)graphicsPanel.ClientSize.Width / universe.GetLength(0);
-            float height = (float)graphicsPanel.ClientSize.Height / universe.GetLength(1);
+            _cellWidth = (float)graphicsPanel.ClientSize.Width / _life.Universe.GetLength(0);
+            _cellHeight = (float)graphicsPanel.ClientSize.Height / _life.Universe.GetLength(1);
 
-            liveCells = 0;
+            _life.LiveCells = 0;
 
-            SolidBrush liveCellBrush = new SolidBrush(Config.LiveCellColor);
-            Pen gridPen = new Pen(Config.GridColor, 1);
-            Pen gridTensPen = new Pen(Config.GridTensColor, 1);
-
-            for (int y = 0; y < universe.GetLength(1); y++)
-                for (int x = 0; x < universe.GetLength(0); x++)
+            for (int y = 0; y < _life.Universe.GetLength(1); y++)
+                for (int x = 0; x < _life.Universe.GetLength(0); x++)
                 {
-                    RectangleF r = new RectangleF(x * width, y * height, width, height);
+                    RectangleF r = new RectangleF(x * _cellWidth, y * _cellHeight, _cellWidth, _cellHeight);
 
-                    if (universe[x, y])
+                    if (_life.Universe[x, y])
                     {
-                        e.Graphics.FillRectangle(liveCellBrush, r);
-                        lblCells.Text = "Cells: " + (++liveCells);
+                        e.Graphics.FillRectangle(new SolidBrush(Config.LiveCellColor), r);
+                        ++_life.LiveCells;
                     }
 
                     if (Config.IsNeighborCountVisible)
-                        ShowNeighborCount(r, CountNeighbors(x, y), e.Graphics);
-
-                    if (Config.IsGridVisible)
-                        e.Graphics.DrawRectangle(gridPen, r.X, r.Y, r.Width, r.Height);
+                        ShowNeighborCount(r, _life.CountNeighbors(x, y), e.Graphics);
                 }
 
-            if (Config.IsGridVisible)
-                for (int y = 0; y < universe.GetLength(1); y += 10)
-                    for (int x = 0; x < universe.GetLength(0); x += 10)
-                        e.Graphics.DrawRectangle(gridTensPen, x * width, y * height, width * 10, height * 10);
+            if (Config.IsGridVisible) DrawGrid(e.Graphics);
+            if (Config.IsHeadsUpDisplayVisible) ShowHeadsUpDisplay(e.Graphics);
 
-            if (Config.IsHeadsUpDisplayVisible)
-            {
-                Font f = new Font("Courier New", 10f);
-                float y = graphicsPanel.ClientSize.Height;
-                float spacing = 15f;
+            lblCells.Text = "Cells: " + _life.LiveCells;
+            lblGeneration.Text = "Generations: " + _life.Generations;
+        }
 
-                e.Graphics.DrawString("Universe Size: {Width=" + Config.Width + ", Height=" + Config.Height +"}", f, Brushes.Red, 2, y - spacing);
-                e.Graphics.DrawString("Boundary Type: " + Config.Boundary, f, Brushes.Red, 2, y - 2 * spacing);
-                e.Graphics.DrawString("Cell Count: " + liveCells, f, Brushes.Red, 2, y - 3 * spacing);
-                e.Graphics.DrawString("Generations: " + generations, f, Brushes.Red, 2, y - 4 * spacing);
-            }
+        private void DrawGrid(Graphics g)
+        {
+            Pen gridPen = new Pen(Config.GridColor, 1);
+            Pen gridTensPen = new Pen(Config.GridTensColor, 1);
+
+            for (int y = 0; y < _life.Universe.GetLength(1); ++y)
+                g.DrawLine(gridPen, 0, y * _cellHeight, Config.Width * _cellWidth, y * _cellHeight);
+
+            for (int x = 0; x < _life.Universe.GetLength(0); ++x)
+                g.DrawLine(gridPen, x * _cellWidth, 0, x * _cellWidth, Config.Height * _cellHeight);
+
+            for (int y = 0; y < _life.Universe.GetLength(1); y += 10)
+                g.DrawLine(gridTensPen, 0, y * _cellHeight, Config.Width * _cellWidth, y * _cellHeight);
+
+            for (int x = 0; x < _life.Universe.GetLength(0); x += 10)
+                g.DrawLine(gridTensPen, x * _cellWidth, 0, x * _cellWidth, Config.Height * _cellHeight);
+        }
+
+        private void ShowHeadsUpDisplay(Graphics g)
+        {
+            Font f = new Font("Courier New", 10f);
+            float y = graphicsPanel.ClientSize.Height;
+            float spacing = 15f;
+
+            g.DrawString("Universe Size: {Width=" + Config.Width + ", Height=" + Config.Height + "}", f, Brushes.Red, 2, y - spacing);
+            g.DrawString("Boundary Type: " + Config.Boundary, f, Brushes.Red, 2, y - 2 * spacing);
+            g.DrawString("Cell Count: " + _life.LiveCells, f, Brushes.Red, 2, y - 3 * spacing);
+            g.DrawString("Generations: " + _life.Generations, f, Brushes.Red, 2, y - 4 * spacing);
         }
 
         /// <summary>
@@ -148,11 +143,8 @@ namespace GameOfLife
             if (count == 0)
                 return;
 
-            float width = (float)graphicsPanel.ClientSize.Width / universe.GetLength(0);
-            float height = (float)graphicsPanel.ClientSize.Height / universe.GetLength(1);
-
             Brush b = (count < 2 || count > 3) ? Brushes.Red : Brushes.Green;
-            Font font = new Font("Courier New", 0.5f * Math.Min(width, height));
+            Font font = new Font("Courier New", 0.5f * Math.Min(_cellWidth, _cellHeight));
 
             StringFormat sf = new StringFormat();
             sf.Alignment = StringAlignment.Center;
@@ -161,20 +153,12 @@ namespace GameOfLife
             g.DrawString(count.ToString(), font, b, r, sf);
         }
 
-        private void DisplayHeadsUp(Font f, Brush b, Graphics g)
-        {
-            g.DrawString("Generations: " + generations, f, b, 0, 0);
-        }
-
         private void graphicsPanel_MouseClick(object sender, MouseEventArgs e)
         {
-            float width = (float)graphicsPanel.ClientSize.Width / universe.GetLength(0);
-            float height = (float)graphicsPanel.ClientSize.Height / universe.GetLength(1);
+            int x = (int)(e.X / _cellWidth);
+            int y = (int)(e.Y / _cellHeight);
 
-            int x = (int)(e.X / width);
-            int y = (int)(e.Y / height);
-
-            universe[x, y] = !universe[x, y];
+            _life.Universe[x, y] = !_life.Universe[x, y];
 
             graphicsPanel.Invalidate();
         }
@@ -187,6 +171,8 @@ namespace GameOfLife
             startToolStripMenuItem.Enabled = false;
             startToolStripButton.Enabled = false;
             runToToolStripMenuItem.Enabled = false;
+            nextToolStripButton.Enabled = false;
+            nextToolStripMenuItem.Enabled = false;
         }
 
         private void pauseToolStripMenuItem_Click(object sender, EventArgs e)
@@ -197,54 +183,27 @@ namespace GameOfLife
             startToolStripMenuItem.Enabled = true;
             startToolStripButton.Enabled = true;
             runToToolStripMenuItem.Enabled = true;
+            nextToolStripButton.Enabled = true;
+            nextToolStripMenuItem.Enabled = true;
         }
 
         private void nextToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            NextGeneration();
+            _life.NextGeneration();
+            graphicsPanel.Invalidate();
         }
 
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            for (int y = 0; y < universe.GetLength(1); y++)
-                for (int x = 0; x < universe.GetLength(0); x++)
-                    universe[x, y] = false;
+            for (int y = 0; y < _life.Universe.GetLength(1); y++)
+                for (int x = 0; x < _life.Universe.GetLength(0); x++)
+                    _life.Universe[x, y] = false;
 
-            lblGeneration.Text = "Generations: " + (generations = 0);
-            lblCells.Text = "Cells: " + (liveCells = 0);
+            lblGeneration.Text = "Generations: " + (_life.Generations = 0);
+            lblCells.Text = "Cells: " + (_life.LiveCells = 0);
 
             if (pauseToolStripButton.Enabled)
                 pauseToolStripMenuItem_Click(sender, e);
-
-            graphicsPanel.Invalidate();
-        }
-
-        /// <summary>
-        ///   This method applies the rules to decide
-        ///   which cells live and die in the next generation.
-        /// </summary>
-        private void NextGeneration()
-        {
-            lblGeneration.Text = "Generations: " + (++generations);
-
-            for (int y = 0; y < universe.GetLength(1); y++)
-                for (int x = 0; x < universe.GetLength(0); x++)
-                    if (universe[x, y]) // living cells
-                    {
-                        int neighbors = CountNeighbors(x, y);
-                        if (neighbors < 2 || neighbors > 3) // die by loneliness or overcrowding
-                            scratchPad[x, y] = false;
-                        else
-                            scratchPad[x, y] = true;
-                    }
-                    else // dead cells
-                    {
-                        if (CountNeighbors(x, y) == 3)
-                            scratchPad[x, y] = true;
-                    }
-
-            universe = scratchPad;
-            scratchPad = new bool[Config.Height, Config.Width];
 
             graphicsPanel.Invalidate();
         }
@@ -256,73 +215,44 @@ namespace GameOfLife
 
         private void runToToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            RunToDialog rtd = new RunToDialog(generations);
+            RunToDialog rtd = new RunToDialog(_life.Generations);
 
             if (rtd.ShowDialog() == DialogResult.OK)
             {
-                generationsLimit = rtd.TargetGeneration;
+                _life.GenerationsLimit = rtd.TargetGeneration;
                 startToolStripMenuItem_Click(sender, e);
             }
         }
 
         private void fromTimeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            RandomizeGrid(Math.Abs((int)DateTime.Now.Ticks));
-        }
-
-        private void RandomizeGrid(int? seed)
-        {
-            if (seed != null)
-            {
-                Config.Rng = new Random((int)seed);
-                Config.Seed = (int)seed;
-            }
-
-            for (int y = 0; y < universe.GetLength(1); y++)
-                for (int x = 0; x < universe.GetLength(0); x++)
-                    universe[x, y] = (Config.Rng.Next() % 2 == 0);
-
+            _life.RandomizeGrid(Math.Abs((int)DateTime.Now.Ticks));
             lblSeed.Text = "Seed: " + Config.Seed;
             graphicsPanel.Invalidate();
         }
 
         private void fromCurrentSeedToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            RandomizeGrid(null);
+            _life.RandomizeGrid(null);
+            lblSeed.Text = "Seed: " + Config.Seed;
+            graphicsPanel.Invalidate();
         }
 
         private void fromNewSeedToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SeedDialog sd = new SeedDialog(Config.Seed);
             if (sd.ShowDialog() == DialogResult.OK)
-                RandomizeGrid(sd.Seed);
+            {
+                _life.RandomizeGrid(sd.Seed);
+                lblSeed.Text = "Seed: " + Config.Seed;
+                graphicsPanel.Invalidate();
+            }
         }
 
         private void resetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Config.LoadInitialConfig();
-            ApplyConfig();
-        }
-
-        /// <summary>
-        ///   Counts the neighbors of a given cell, considering a Finite universe.
-        /// </summary>
-        /// <param name="col">Cell's column number.</param>
-        /// <param name="row">Cell's row number.</param>
-        /// <returns>Returns the number of neighbors.</returns>
-        private int CountNeighbors(int col, int row)
-        {
-            int neighbors = 0;
-
-            for (int y = row - 1; (y <= row + 1) && (y < universe.GetLength(1)); y++)
-                if (y >=0)
-                    for (int x = col - 1; (x <= col + 1) && (x < universe.GetLength(0)); x++)
-                        if (x >=0 )
-                            if (x != col || y != row)
-                                if (universe[x, y])
-                                    neighbors++;
-            
-            return neighbors;
+            UpdateFromConfig();
         }
     }
 }

@@ -41,10 +41,16 @@ namespace GameOfLife
             GridTensColor = Color.Black;
             BackgroundColor = Color.White;
             LiveCellColor = Color.LimeGreen;
-            Boundary = Boundaries.Finite;
+            Boundary = Boundaries.Toroidal;
             IsGridVisible = true;
             IsHeadsUpDisplayVisible = true;
-            IsNeighborCountVisible = true;
+            IsNeighborCountVisible = false;
+
+            if (Rng == null)
+            {
+                Seed = Math.Abs((int)DateTime.Now.Ticks);
+                Rng = new Random(Seed);
+            }
         }
     }
 }
