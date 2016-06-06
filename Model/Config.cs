@@ -9,6 +9,10 @@ namespace GameOfLife
     /// </summary>
     public static class Config
     {
+        // If the process is running on high DPI monitors,
+        // we need to adjust font size and spacing.
+        public static bool IsProcessHighDPI { get; set; }
+
         public static Random Rng { get; set; }
         public static int Seed { get; set; }
 
@@ -16,13 +20,18 @@ namespace GameOfLife
         public static int Width { get; set; }    // Universe's columns.
         public static int Height { get; set; }   // Universe's rows.
 
+        // Color properties for Game of Life:
         public static Color GridColor { get; set; }
         public static Color GridTensColor { get; set; }
         public static Color BackgroundColor { get; set; }
         public static Color LiveCellColor { get; set; }
+        // Default Colors:
+        public static Color DefaultGridColor { get { return Color.LightGray; } }
+        public static Color DefaultGridTensColor { get { return Color.Black; } }
+        public static Color DefaultBackgroundColor { get { return Color.White; } }
+        public static Color DefaultLiveCellColor { get { return Color.LimeGreen; } }
 
-        public enum Boundaries { Toroidal, Finite };
-        public static Boundaries Boundary { get; set; }
+        public static Life.Boundaries Boundary { get; set; } // Finite or Toroidal.
 
         public static bool IsGridVisible { get; set; }
         public static bool IsHeadsUpDisplayVisible { get; set; }
@@ -35,13 +44,12 @@ namespace GameOfLife
         public static void LoadInitialConfig()
         {
             Interval = 20;
-            Width = Height = 50;
+            Width = 100;
+            Height = 50;
 
-            GridColor = Color.LightGray;
-            GridTensColor = Color.Black;
-            BackgroundColor = Color.White;
-            LiveCellColor = Color.LimeGreen;
-            Boundary = Boundaries.Toroidal;
+            LoadDefaultColors();
+            
+            Boundary = Life.Boundaries.Toroidal;
             IsGridVisible = true;
             IsHeadsUpDisplayVisible = true;
             IsNeighborCountVisible = false;
@@ -51,6 +59,14 @@ namespace GameOfLife
                 Seed = Math.Abs((int)DateTime.Now.Ticks);
                 Rng = new Random(Seed);
             }
+        }
+
+        public static void LoadDefaultColors()
+        {
+            GridColor = Color.LightGray;
+            GridTensColor = Color.Black;
+            BackgroundColor = Color.White;
+            LiveCellColor = Color.LimeGreen;
         }
     }
 }

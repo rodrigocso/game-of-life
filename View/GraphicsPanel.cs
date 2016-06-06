@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GameOfLife
 {
+    /// <summary>
+    ///   The panel where GoL Universe is painted to.
+    /// </summary>
     public class GraphicsPanel : Panel
     {
         public GraphicsPanel()

@@ -32,6 +32,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,14 +49,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\CellsFile.cs" />
     <Compile Include="Model\Config.cs" />
-    <Compile Include="Model\GameOfLife.cs" />
-    <Compile Include="View\AboutDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="View\AboutDialog.Designer.cs">
-      <DependentUpon>AboutDialog.cs</DependentUpon>
-    </Compile>
+    <Compile Include="Model\Life.cs" />
     <Compile Include="View\GameOfLifeForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -83,9 +81,6 @@
     <Compile Include="View\SeedDialog.Designer.cs">
       <DependentUpon>SeedDialog.cs</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="View\AboutDialog.resx">
-      <DependentUpon>AboutDialog.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="View\GameOfLifeForm.resx">
       <DependentUpon>GameOfLifeForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -132,6 +127,33 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\progIco.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Transparent.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Check.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Settings_24x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Dice.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ImportFile_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Close_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Save_32x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\OpenFolder_32x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\VSO_NewFile_40x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
