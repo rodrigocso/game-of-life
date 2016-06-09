@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GameOfLife
@@ -19,8 +12,7 @@ namespace GameOfLife
         }
 
         /// <summary>
-        /// Load config to form controls.
-        /// <see cref="Config"/>
+        ///   Load <see cref="Config"/> to form controls.
         /// </summary>
         private void UpdateViewFromConfig()
         {
@@ -45,8 +37,7 @@ namespace GameOfLife
         }
 
         /// <summary>
-        /// Save user's customized options to config.
-        /// <see cref="Config"/>
+        ///   Save user's customized options to <see cref="Config"/>.
         /// </summary>
         private void UpdateConfigFromView()
         {
@@ -65,23 +56,16 @@ namespace GameOfLife
                 Config.Boundary = Life.Boundaries.Finite;
         }
 
+        /// <summary>
+        ///   Changes the back color of a button.
+        /// </summary>
+        /// <param name="btn">Button to change the back color.</param>
         private void ChangeColor(Button btn)
         {
             ColorDialog cd = new ColorDialog();
 
             if (cd.ShowDialog() == DialogResult.OK)
                 btn.BackColor = cd.Color;
-        }
-
-        private void btnOK_Click(object sender, EventArgs e)
-        {
-            UpdateConfigFromView();
-            Close();
-        }
-
-        private void btnCancel_Click(object sender, EventArgs e)
-        {
-            Close();
         }
 
         private void btnColorGrid_Click(object sender, EventArgs e)
@@ -104,12 +88,24 @@ namespace GameOfLife
             ChangeColor(btnColorLiveCell);
         }
 
+        /// <summary>
+        ///   Reloads the default colors.
+        /// </summary>
         private void btnColorReset_Click(object sender, EventArgs e)
         {
             btnColorBack.BackColor = Config.DefaultBackgroundColor;
             btnColorGrid.BackColor = Config.DefaultGridColor;
             btnColorGridx10.BackColor = Config.DefaultGridTensColor;
             btnColorLiveCell.BackColor = Config.DefaultLiveCellColor;
+        }
+
+        /// <summary>
+        ///   When the user clicks OK, settings must be saved to
+        ///   <see cref="Config"/>
+        /// </summary>
+        private void btnOK_Click(object sender, EventArgs e)
+        {
+            UpdateConfigFromView();
         }
     }
 }

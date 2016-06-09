@@ -24,10 +24,10 @@ namespace GameOfLife
             _writer.WriteLine("!Name: " + Path.GetFileNameWithoutExtension(fileName));
             _writer.WriteLine("!");
 
-            for (int y = 0; y < life.Universe.GetLength(1); y++)
+            for (int col = 0; col < life.Universe.GetLength(1); col++)
             {
-                for (int x = 0; x < life.Universe.GetLength(0); x++)
-                    _writer.Write(life.Universe[x, y] ? "O" : ".");
+                for (int row = 0; row < life.Universe.GetLength(0); row++)
+                    _writer.Write(life.Universe[row, col] ? "O" : ".");
 
                 _writer.WriteLine();
             }
@@ -73,9 +73,9 @@ namespace GameOfLife
             life.Universe = new bool[Config.Height, Config.Width];
             life.ScratchPad = new bool[Config.Height, Config.Width];
 
-            for (int y = 0; y < lines[0].Length; y++)
-                for (int x = 0; x < lines.Count; x++)
-                    life.Universe[x, y] = (lines[x][y] == 'O');
+            for (int col = 0; col < lines[0].Length; col++)
+                for (int row = 0; row < lines.Count; row++)
+                    life.Universe[row, col] = (lines[row][col] == 'O');
         }
 
         /// <summary>
@@ -108,12 +108,12 @@ namespace GameOfLife
                     return;
             }
 
-            int y = Config.Width / 2 - lines[0].Length / 2;
-            int x = Config.Height / 2 - lines.Count / 2;
+            int col = Config.Width / 2 - lines[0].Length / 2;
+            int row = Config.Height / 2 - lines.Count / 2;
 
             for (int j = 0; j < lines[0].Length; j++)
                 for (int i = 0; i < lines.Count; i++)
-                    life.Universe[x + i, y + j] = (lines[i][j] == 'O');
+                    life.Universe[row + i, col + j] = (lines[i][j] == 'O');
         }
     }
 }

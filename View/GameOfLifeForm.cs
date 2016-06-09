@@ -24,7 +24,7 @@ namespace GameOfLife
         public GameOfLifeForm()
         {
             InitializeComponent();
-            Config.LoadInitialConfig();
+            Config.LoadCurrentConfig();
             _life.UpdateFromConfig();
             UpdateFromConfig();
 
@@ -45,8 +45,7 @@ namespace GameOfLife
 
         /// <summary>
         ///   <para>Applies configuration information available
-        ///   on Config (static) class to update the form.</para>
-        ///   <see cref="Config"/> for more details.
+        ///   on <see cref="Config"/> class to update the form.</para>
         /// </summary>
         private void UpdateFromConfig()
         {
@@ -54,25 +53,35 @@ namespace GameOfLife
             lblSeed.Text = "Seed: " + Config.Seed;
             lblBoundary.Text = "Boundary: " + Config.Boundary;
 
-            gridVisibleToolStripMenuItem.Checked = Config.IsGridVisible;
-            headsUpVisibleToolStripMenuItem.Checked = Config.IsHeadsUpDisplayVisible;
-            neighborCountVisibleToolStripMenuItem.Checked = Config.IsNeighborCountVisible;
+            GridVisibleToolStripMenuItem_Click(null, null);
+            NeighborCountVisibleToolStripMenuItem_Click(null, null);
+            HeadsUpVisibleToolStripMenuItem_Click(null, null);
 
             graphicsPanel.BackColor = Config.BackgroundColor;
             graphicsPanel.Invalidate();
         }
 
         /// <summary>
-        ///   Menu > View > Neighbor Count.
+        ///   <para>Menu > View > Neighbor Count</para>
+        ///   <para>Turns on the neighbor count visualization.</para>
         /// </summary>
-        private void NeighborCountVisibleToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        private void NeighborCountVisibleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Config.IsNeighborCountVisible = neighborCountVisibleToolStripMenuItem.Checked;
+            if (sender != null)
+                Config.IsNeighborCountVisible = !Config.IsNeighborCountVisible;
+
+            neighborCountVisibleToolStripMenuItem.Checked = ctxMenuViewNeighborCount.Checked = Config.IsNeighborCountVisible;
 
             if (Config.IsNeighborCountVisible)
+            {
                 neighborCountVisibleToolStripMenuItem.Image = Properties.Resources.Check;
+                ctxMenuViewNeighborCount.Image = Properties.Resources.Check;
+            }
             else
+            {
                 neighborCountVisibleToolStripMenuItem.Image = Properties.Resources.Transparent;
+                ctxMenuViewNeighborCount.Image = Properties.Resources.Transparent;
+            }
 
             graphicsPanel.Invalidate();
         }
@@ -80,14 +89,23 @@ namespace GameOfLife
         /// <summary>
         ///   Menu > View > Heads Up Display.
         /// </summary>
-        private void HeadsUpVisibleToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        private void HeadsUpVisibleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Config.IsHeadsUpDisplayVisible = headsUpVisibleToolStripMenuItem.Checked;
+            if (sender != null)
+                Config.IsHeadsUpDisplayVisible = !Config.IsHeadsUpDisplayVisible;
+
+            headsUpVisibleToolStripMenuItem.Checked = ctxMenuViewHUD.Checked = Config.IsHeadsUpDisplayVisible;
 
             if (Config.IsHeadsUpDisplayVisible)
+            {
                 headsUpVisibleToolStripMenuItem.Image = Properties.Resources.Check;
+                ctxMenuViewHUD.Image = Properties.Resources.Check;
+            }
             else
+            {
                 headsUpVisibleToolStripMenuItem.Image = Properties.Resources.Transparent;
+                ctxMenuViewHUD.Image = Properties.Resources.Transparent;
+            }
 
             graphicsPanel.Invalidate();
         }
@@ -95,14 +113,23 @@ namespace GameOfLife
         /// <summary>
         ///   Menu > View > Grid.
         /// </summary>
-        private void GridVisibleToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
+        private void GridVisibleToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Config.IsGridVisible = gridVisibleToolStripMenuItem.Checked;
+            if (sender != null)
+                Config.IsGridVisible = !Config.IsGridVisible;
+
+            gridVisibleToolStripMenuItem.Checked = ctxMenuViewGrid.Checked = Config.IsGridVisible;
 
             if (Config.IsGridVisible)
+            {
                 gridVisibleToolStripMenuItem.Image = Properties.Resources.Check;
+                ctxMenuViewGrid.Image = Properties.Resources.Check;
+            }
             else
+            {
                 gridVisibleToolStripMenuItem.Image = Properties.Resources.Transparent;
+                ctxMenuViewGrid.Image = Properties.Resources.Transparent;
+            }
 
             graphicsPanel.Invalidate();
         }
@@ -121,9 +148,9 @@ namespace GameOfLife
         }
 
         /// <summary>
-        ///   Display current Game of Life Universe state.
+        ///   Display current Game of Life Universe state
+        ///   on the graphics panel.
         /// </summary>
-        /// <see cref="GraphicsPanel"/>
         private void graphicsPanel_Paint(object sender, PaintEventArgs e)
         {
             _cellHeight = (float)graphicsPanel.ClientSize.Height / _life.Universe.GetLength(0);
@@ -222,12 +249,15 @@ namespace GameOfLife
         /// </summary>
         private void graphicsPanel_MouseClick(object sender, MouseEventArgs e)
         {
-            int row = (int)(e.Y / _cellHeight);
-            int col = (int)(e.X / _cellWidth);
+            if (e.Button == MouseButtons.Left)
+            {
+                int row = (int)(e.Y / _cellHeight);
+                int col = (int)(e.X / _cellWidth);
 
-            _life.Universe[row, col] = !_life.Universe[row, col];
+                _life.Universe[row, col] = !_life.Universe[row, col];
 
-            graphicsPanel.Invalidate();
+                graphicsPanel.Invalidate();
+            }
         }
 
         /// <summary>
@@ -240,11 +270,14 @@ namespace GameOfLife
             timer.Enabled = true;
             pauseToolStripMenuItem.Enabled = true;
             pauseToolStripButton.Enabled = true;
+            ctxMenuPause.Enabled = true;
             startToolStripMenuItem.Enabled = false;
             startToolStripButton.Enabled = false;
+            ctxMenuStart.Enabled = false;
             runToToolStripMenuItem.Enabled = false;
             nextToolStripButton.Enabled = false;
             nextToolStripMenuItem.Enabled = false;
+            ctxMenuNext.Enabled = false;
         }
 
         /// <summary>
@@ -256,16 +289,19 @@ namespace GameOfLife
             timer.Enabled = false;
             pauseToolStripMenuItem.Enabled = false;
             pauseToolStripButton.Enabled = false;
+            ctxMenuPause.Enabled = false;
             startToolStripMenuItem.Enabled = true;
             startToolStripButton.Enabled = true;
+            ctxMenuStart.Enabled = true;
             runToToolStripMenuItem.Enabled = true;
             nextToolStripButton.Enabled = true;
             nextToolStripMenuItem.Enabled = true;
+            ctxMenuNext.Enabled = true;
         }
 
         /// <summary>
         ///   <para>Menu > Run > Next or toolbar button Next.</para>
-        ///   <para>Change GoL Universe to next generation.</para>
+        ///   <para>Advance GoL Universe to next generation.</para>
         /// </summary>
         private void nextToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -300,6 +336,14 @@ namespace GameOfLife
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Close();
+        }
+
+        /// <summary>
+        ///   Before the application closes, the settings must be saved.
+        /// </summary>
+        private void GameOfLifeForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            Config.Save();
         }
 
         /// <summary>
@@ -410,13 +454,34 @@ namespace GameOfLife
         }
 
         /// <summary>
+        ///   <para>Menu > Tools > Settings > Reload Previous</para>
+        ///   <para>Reload the application to the previous settings,
+        ///   which means the settings that were active when the
+        ///   current session began.</para>
+        /// </summary>
+        private void reloadPreviousToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Config.Load(Config.Configuration.Previous);
+            UpdateFromConfig();
+            _life.UpdateFromConfig();
+            graphicsPanel.Invalidate();
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AboutBox ab = new AboutBox();
+            ab.ShowDialog();
+        }
+
+        /// <summary>
         ///   <para>Menu > Tools > Reset Options</para>
         ///   <para>Reset to application to default settings.</para>
-        ///   <see cref="Config.LoadInitialConfig()"/>
+        ///   <see cref="Config.LoadCurrentConfig()"/>
         /// </summary>
-        private void resetOptionsToolStripMenuItem_Click(object sender, EventArgs e)
+        private void resetToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Config.LoadInitialConfig();
+            Config.Load(Config.Configuration.Default);
+            _life.UpdateFromConfig();
             UpdateFromConfig();
         }
 

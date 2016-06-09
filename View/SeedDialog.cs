@@ -1,15 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace GameOfLife
 {
+    /// <summary>
+    ///   A dialog where a user can type a
+    ///   custom seed or generate a random one.
+    /// </summary>
     public partial class SeedDialog : Form
     {
         public int Seed { get; set; }
@@ -21,21 +18,13 @@ namespace GameOfLife
             nudSeed.Minimum = int.MinValue;
             nudSeed.Value = Seed = seed;
         }
-
+        
+        /// <summary>
+        ///   Fills the Numeric Up Down with a random integer.
+        /// </summary>
         private void btnRandomize_Click(object sender, EventArgs e)
         {
             nudSeed.Value = Seed = Config.Rng.Next();
-        }
-
-        private void btnOK_Click(object sender, EventArgs e)
-        {
-            Seed = (int)nudSeed.Value;
-            Close();
-        }
-
-        private void btnCancel_Click(object sender, EventArgs e)
-        {
-            Close();
         }
     }
 }

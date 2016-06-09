@@ -16,7 +16,9 @@ namespace GameOfLife
         public int GenerationsLimit { get; set; } // Set by "Run To..."
         public int LiveCells { get; set; }
         public bool HasReachedLimit // "Run To..." stop flag
-        { get { return Generations == GenerationsLimit; } }
+        {
+            get { return Generations == GenerationsLimit; }
+        }
 
         public Life()
         {
@@ -25,8 +27,7 @@ namespace GameOfLife
 
         /// <summary>
         ///   Updates the Game of Life settings
-        ///   from Config.
-        ///   <see cref="Config"/>
+        ///   from <see cref="Config"/>.
         /// </summary>
         public void UpdateFromConfig()
         {
